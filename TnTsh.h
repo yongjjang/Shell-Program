@@ -1,19 +1,17 @@
 #include <unistd.h>
-#define true 1
-#define false 0
 
 void init_sh();
 void redirection();
-int getargs(char *cmd, char **argv);
+int getargs(char *cmd, char *argv[]);
 void eval();
 void run();
+void change_directory(int argc, char *argv);
 
-//void change_directory(int argc, char *argv[])
+#define BUF_SIZE 256
 
-char buf[256];
+char buf[BUF_SIZE];
 char *argv[50];
 int narg;
 pid_t pid;
-int check_cmd;
-
+char pwd[BUF_SIZE];
 

@@ -25,43 +25,44 @@ int getargs(char *cmd, char **argv){
       while(*cmd != '\0' && *cmd != ' ' && *cmd != '\t') cmd ++;
     }
 
-    if(strcmp("cd", argv[0]) == 0){
-      cmd_check = true;
-    }
-    else if(strcmp("exit", argv[0]) == 0){
+    if(strcmp("exit", argv[0]) == 0){
       printf("\n\nTnT Shell is Die TnT,,,\n");
       exit(1);
     }
-    argv[narg] = NULL;
-    return narg;
+
+    if(strcmp("cd", argv[0]) == 0)
+      change_directory(narg, argv);
   }
+  
+    
+  argv[narg] = NULL;
+  return narg;
+
 }
 
 void run(){
   while(1){
-    cmd_check = false;
-    printf("%s $", getenv("PWD"));
+    getcwd(pwd,BUF_SIZE);
+    printf("%s$ ", pwd);
     gets(buf);
     narg = getargs(buf, argv);
 
-    if(cmd_check){
-      pid = fork();
+    pid = fork();
 
-      if (pid == 0){
-	execvp(argv[0], argv);
-
-      }
-      else if(pid > 0){
-	//sig_int();
-	//sig_quit();
-	wait((int *) 0);
-      }
-      else
-	perror("fork failed");
+    if (pid == 0){
+      execvp(argv[0], argv);
+      exit(1);
     }
+    else if(pid > 0){
+      //sig_int();
+      //sig_quit();
+      wait((int *) 0);
+    }
+    else
+      perror("fork failed");
   }
-
 }
+
 void main(){
   init_sh();
   run();
