@@ -11,7 +11,7 @@ void change_directory(int argc, char *argv);
 
 char buf[BUF_SIZE];
 char *argv[50];
-int narg;
+int narg, status;
 pid_t pid;
 char pwd[BUF_SIZE];
 

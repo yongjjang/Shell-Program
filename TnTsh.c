@@ -25,15 +25,15 @@ int getargs(char *cmd, char **argv){
       printf("\n\nTnT Shell is Die TnT,,,\n");
       exit(1);
     }
-
-    //if(strcmp("cd", argv[0]) == 0)
-   //   change_directory(narg, argv);
-  }
-  
     
+    if(strcmp("cd", argv[0]) == 0){
+      change_directory(narg, argv);
+    }
+
+
+  }
   argv[narg] = NULL;
   return narg;
-
 }
 
 void run(){
@@ -49,12 +49,14 @@ void run(){
       redirect_in(argv);
       redirect_out(argv);
       redirect_append(argv);
-     // pipe_tnt(argv);
-      execvp(argv[0], argv);
+      // pipe_tnt(argv);
+      if(strcmp(argv[0],"cd"))
+	if(execvp(argv[0], argv) == -1)
+	   printf("%s: command not found\n",argv[0]);
       exit(1);
     }
     else if(pid > 0){
-      wait((int *) 0);
+      pid = wait(&status);
     }
     else
       perror("fork failed");
