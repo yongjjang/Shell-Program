@@ -1,8 +1,8 @@
+#include "TnTsh.h"
 #include <stdio.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-
 
 // < file    // 파일로부터 표준 입력을 받는다.
 void redirect_in(char **argv){
@@ -15,7 +15,7 @@ void redirect_in(char **argv){
     }
 
     if(argv[i]){
-        if(!cmd[i+1]){
+        if(!argv[i+1]){
             return -1;
         }
         else{
@@ -36,41 +36,101 @@ void redirect_in(char **argv){
     }
 }
 
-// redir >>  // 파일 끝에 덧붙임
-void redirect_append(){
-
-}
-
 // redir >   // 파일 전체를 새로 저장
-void redirect_out(char *cmd){
-    int fd; 
-    char *buf = "This is a test output file.\n";
-    int flags = O_WRONLY | O_CREAT | O_TRUNC;
-    mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH; /* == 0644 */
+void redirect_out(char **argv){
+    int i;
+    int fd;
 
-    if (argc < 2) {
-        fprintf(stderr, "Usage: file_output filename\n");
-        exit(1);
-    }
-    if ( (fd = open(argv[1], flags, mode)) == -1 ) {
-        perror("open"); /* errno에 대응하는 메시지 출력됨*/
-        exit(1);
-    }
-    if ( dup2(fd, 1) == -1 ) {
-        perror("dup2"); /* errno에 대응하는 메시지 출력됨 */
-        exit(1);
-    }
-    if ( close(fd) == -1 ) {
-        perror("close"); //errno에 대응하는 메시지 출력됨
-        exit(1);
+    for(i=0; argv[i] != NULL; i++){
+        if(!strcmp(argv[i], ">"))
+            break;
     }
 
-    write(1, buf, strlen(buf));
-    exit(0);
+    if(argv[i]){
+        if(!argv[i+1]){
+            return -1;
+        }
+        else{
+            if((fd = open(argv[i+1], O_RDWR | O_CREAT| S_IRUSR, 0644)) == -1){
+                perror(argv[i+1]);
+                return -1;
+            }
+        }
+        
+        dup2(fd, STDOUT_FILENO);
+        close(fd);
+        argv[i] = NULL;
+        argv[i+1] = NULL;
+        for(i=i; argv[i] != NULL; i++){
+            argv[i] = argv[i+2];
+        }
+
+        argv[i] = NULL;
+    }
 }
 
-int main(int argc, char *argv[])
-{
+// redir >>  // 파일 끝에 덧붙임
+void redirect_append(char **argv){
+    int i;
+    int fd;
 
-    return 0;
+    for(i=0; argv[i] != NULL; i++){
+        if(!strcmp(argv[i], ">>"))
+            break;
+    }
+
+    if(argv[i]){
+        if(!argv[i+1]){
+            return -1;
+        }
+        else{
+            if((fd = open(argv[i+1], O_RDWR | O_APPEND | O_CREAT, 0644)) == -1){
+                perror(argv[i+1]);
+                return -1;
+            }
+        }
+        
+        dup2(fd, STDOUT_FILENO);
+        close(fd);
+        argv[i] = NULL;
+        argv[i+1] = NULL;
+        for(i=i; argv[i] != NULL; i++){
+            argv[i] = argv[i+2];
+        }
+
+        argv[i] = NULL;
+    }
+}
+void pipe_tnt(char **argv){
+    int i;
+    int k = 0;
+    pid_t pid1, pid2;
+    int fd[2];
+    char cmdvectorPipe1[50], cmdvectorPipe2[50];
+
+    for(i=0; argv[i] != NULL; i++){
+        if(!strcmp(argv[i], "|")){
+            cmdvectorPipe1[i] = NULL;
+            break;
+        }
+        cmdvectorPipe1[i] = argv[i];
+    }
+    for(i=i+1; argv[i] != NULL; i++){
+        cmdvectorPipe2[k] = argv[i];
+        k++;
+    }
+
+    pipe(fd);
+    
+    pid1 = fork();
+    switch(pid1){
+        case -1: perror("fork error"); break;
+        case 0:
+            redirect_in(cmdvectorPipe1);
+            dup2(fd[1], STDOUT_FILENO);
+            close(fd[1]);
+            close(fd[0]);
+            execvp(cmdvectorPipe1[0], cmdvectorPipe1);
+            exit(0);
+    }
 }

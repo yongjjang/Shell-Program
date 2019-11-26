@@ -3,13 +3,13 @@
 #include "header.h"
 #include <signal.h>
 void handler_int(int signo){
-    printf("CTRL + c 입력!! -> SIGINT 실행\n");
+    printf("\nCTRL + c 입력!! -> SIGINT 실행\n");
     pid_t ppid = getppid();
     kill(ppid, SIGINT);
 }
 
 void handler_quit(int signo){
-    printf("CTRL + z 입력!! -> SIGQUIT 실행\nQuit (core dumped)");
+    printf("\nCTRL + z 입력!! -> SIGQUIT 실행\nQuit (core dumped)\n");
     pid_t ppid = getppid();
     kill(ppid, SIGQUIT);
 }
