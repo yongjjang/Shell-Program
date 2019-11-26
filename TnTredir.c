@@ -117,9 +117,6 @@ void pipe_tnt(char **argv){
     cmdvectorPipe1 = argv[0];
     cmdvectorPipe2 = argv[i+1];
 
-    printf("%s\n", cmdvectorPipe1);
-    printf("%s\n", cmdvectorPipe2);
-    printf("%s\n", argv[i]);
 
     if(strcmp(argv[i], "|") == 0){
         pipe(fd);
@@ -132,7 +129,7 @@ void pipe_tnt(char **argv){
                      dup2(fd[1], STDOUT_FILENO);
                      close(fd[1]);
                      close(fd[0]);
-     //                execvp(cmdvectorPipe1[0], cmdvectorPipe1);
+		     execvp(cmdvectorPipe1[0], cmdvectorPipe1);
         }
         pid2 = fork();
         switch(pid2){
@@ -142,7 +139,7 @@ void pipe_tnt(char **argv){
                      dup2(fd[1], STDIN_FILENO);
                      close(fd[1]);
                      close(fd[0]);
-   //                  execvp(cmdvectorPipe2[0], cmdvectorPipe2);
+		     execvp(cmdvectorPipe2[0], cmdvectorPipe2);
         }
     }
 }
