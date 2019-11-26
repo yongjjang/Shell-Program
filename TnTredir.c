@@ -1,4 +1,3 @@
-#include "TnTsh.h"
 #include <stdio.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -24,7 +23,7 @@ void redirect_in(char **argv){
                 return -1;
             }
         }
-        
+
         dup2(fd, STDIN_FILENO);
         close(fd);
 
@@ -56,7 +55,7 @@ void redirect_out(char **argv){
                 return -1;
             }
         }
-        
+
         dup2(fd, STDOUT_FILENO);
         close(fd);
         argv[i] = NULL;
@@ -89,7 +88,7 @@ void redirect_append(char **argv){
                 return -1;
             }
         }
-        
+
         dup2(fd, STDOUT_FILENO);
         close(fd);
         argv[i] = NULL;
@@ -106,31 +105,44 @@ void pipe_tnt(char **argv){
     int k = 0;
     pid_t pid1, pid2;
     int fd[2];
-    char cmdvectorPipe1[50], cmdvectorPipe2[50];
+    char *cmdvectorPipe1;
+    char *cmdvectorPipe2;
 
     for(i=0; argv[i] != NULL; i++){
         if(!strcmp(argv[i], "|")){
-            cmdvectorPipe1[i] = NULL;
             break;
         }
-        cmdvectorPipe1[i] = argv[i];
     }
-    for(i=i+1; argv[i] != NULL; i++){
-        cmdvectorPipe2[k] = argv[i];
-        k++;
-    }
-
-    pipe(fd);
     
-    pid1 = fork();
-    switch(pid1){
-        case -1: perror("fork error"); break;
-        case 0:
-            redirect_in(cmdvectorPipe1);
-            dup2(fd[1], STDOUT_FILENO);
-            close(fd[1]);
-            close(fd[0]);
-            execvp(cmdvectorPipe1[0], cmdvectorPipe1);
-            exit(0);
+    cmdvectorPipe1 = argv[0];
+    cmdvectorPipe2 = argv[i+1];
+
+    printf("%s\n", cmdvectorPipe1);
+    printf("%s\n", cmdvectorPipe2);
+    printf("%s\n", argv[i]);
+
+    if(strcmp(argv[i], "|") == 0){
+        pipe(fd);
+
+        pid1 = fork();
+        switch(pid1){
+            case -1: perror("fork error"); break;
+            case 0:
+                     redirect_in(cmdvectorPipe1);
+                     dup2(fd[1], STDOUT_FILENO);
+                     close(fd[1]);
+                     close(fd[0]);
+     //                execvp(cmdvectorPipe1[0], cmdvectorPipe1);
+        }
+        pid2 = fork();
+        switch(pid2){
+            case -1: perror("fork error"); break;
+            case 0:
+                     redirect_out(cmdvectorPipe2);
+                     dup2(fd[1], STDIN_FILENO);
+                     close(fd[1]);
+                     close(fd[0]);
+   //                  execvp(cmdvectorPipe2[0], cmdvectorPipe2);
+        }
     }
 }

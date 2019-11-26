@@ -60,7 +60,7 @@ void run(){
       redirect_in(argv);
       redirect_out(argv);
       redirect_append(argv);
-      // pipe_tnt(argv);
+      pipe_tnt(argv);
       if(strcmp(argv[0],"cd"))
 	if(!IS_BACKGROUND){
 	  if(execvp(argv[0], argv) == -1)
