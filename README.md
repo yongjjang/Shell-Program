@@ -13,6 +13,30 @@
 5. ls, pwd, cd, mkdir, rmdir, ln, cp, rm, mv, cat 명령을 구현하시오.
 6. 파이프(|) 기능을 추가하도록 수정하시오.
 
+## Running screen
+### Main
+![main2](./image/main2.png)
+
+### Exit
+![exit](./image/exit.png)
+
+### Redirect
+![redirect](./image/redirect.png)
+![redirect2](./image/redirect2.png)
+
+### Exception
+![exception](./image/exception.png)
+
+### Background
+![background](./image/background.png)
+
+### Interupt
+![interupt](./image/interupt.png)
+
+### Running test (ls, rm, cd, cp ...)
+![test](./image/test.png)
+
+
 ### 작업자 
 - Inhwan JEONG(ghjklla007@naver.com)
   - [Go to Author's Github Page](https://github.com/InhwanJeong)
